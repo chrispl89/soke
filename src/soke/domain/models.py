@@ -10,6 +10,10 @@ class ClientInput(BaseModel):
     old_energy_price_pln_per_kwh: float = Field(ge=0)
     new_energy_price_pln_per_kwh: float = Field(ge=0)
 
+    # Moduł PV - Fotowoltaika
+    pv_annual_production_kwh: float = Field(ge=0, default=0.0)
+    pv_energy_sold_to_grid_kwh: float = Field(ge=0, default=0.0)
+
 class TariffGroupRates(BaseModel):
     # MVP: tylko to, czego potrzebują moduły A–D
     c11_variable_pln_per_kwh: float

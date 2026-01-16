@@ -28,6 +28,11 @@ def main() -> None:
         new_energy_price = st.number_input("Nowa cena energii czynnej (zł/kWh)", min_value=0.0, value=0.72, step=0.01)
         
         st.divider()
+        st.markdown("### Fotowoltaika (opcjonalnie)")
+        pv_annual_production = st.number_input("Roczny wolumen produkcji z PV (kWh)", min_value=0.0, value=0.0, step=1000.0, help="Całkowita roczna produkcja z instalacji fotowoltaicznej")
+        pv_energy_sold = st.number_input("Energia oddana do sieci (kWh)", min_value=0.0, value=0.0, step=1000.0, help="Ilość energii oddanej do sieci w ciągu roku")
+        
+        st.divider()
         st.markdown("### Inwestycja (opcjonalnie)")
         investment_pln = st.number_input("Koszt inwestycji (zł)", min_value=0.0, value=0.0, step=1000.0, help="Np. koszt kompensatora mocy biernej")
         st.session_state["soke_investment_pln"] = investment_pln
@@ -39,6 +44,8 @@ def main() -> None:
             annual_kwh=annual_kwh,
             old_energy_price_pln_per_kwh=old_energy_price,
             new_energy_price_pln_per_kwh=new_energy_price,
+            pv_annual_production_kwh=pv_annual_production,
+            pv_energy_sold_to_grid_kwh=pv_energy_sold,
         )
 
     render_tabs(client=client, tariffs=tariffs)

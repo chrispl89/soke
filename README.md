@@ -17,7 +17,8 @@ Instalator automatycznie:
 - ✅ Zainstaluje wszystkie zależności projektu
 
 📖 **Szybki start:** [QUICKSTART.md](QUICKSTART.md)  
-📚 **Szczegółowe instrukcje:** [INSTALL.md](INSTALL.md)
+📚 **Szczegółowe instrukcje:** [INSTALL.md](INSTALL.md)  
+👤 **Dla osób niekomputerowych:** [INSTRUKCJA_INSTALACJI.txt](INSTRUKCJA_INSTALACJI.txt)
 
 ## Start
 

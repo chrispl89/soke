@@ -1,18 +1,29 @@
 # Instalator SOKE dla Windows
 # Instaluje Pythona (jeśli potrzebny) i wszystkie zależności projektu
+# Przyjazny dla osób niekomputerowych - automatyczna instalacja
 
 param(
-    [switch]$SkipPythonCheck = $false
+    [switch]$SkipPythonCheck = $false,
+    [switch]$AutoInstallPython = $true
 )
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $ScriptDir
 
+Write-Host ""
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host "  SOKE - Instalator Windows" -ForegroundColor Cyan
 Write-Host "  System Optymalizacji Kosztów Energii" -ForegroundColor Cyan
 Write-Host "================================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Ten instalator automatycznie:" -ForegroundColor White
+Write-Host "  • Sprawdzi czy Python jest zainstalowany" -ForegroundColor Gray
+Write-Host "  • Zainstaluje Pythona (jeśli potrzeba)" -ForegroundColor Gray
+Write-Host "  • Zainstaluje wszystkie potrzebne programy" -ForegroundColor Gray
+Write-Host "  • Przygotuje aplikację do uruchomienia" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Proszę czekać, instalacja może potrwać kilka minut..." -ForegroundColor Yellow
 Write-Host ""
 
 # Funkcja sprawdzająca czy Python jest zainstalowany
@@ -83,20 +94,51 @@ if (-not $SkipPythonCheck) {
     if (-not (Test-PythonInstalled)) {
         Write-Host "Python nie jest zainstalowany lub wersja jest za stara (wymagany 3.11+)" -ForegroundColor Yellow
         Write-Host ""
-        $installPython = Read-Host "Czy chcesz zainstalować Pythona automatycznie? (T/N)"
-        if ($installPython -eq "T" -or $installPython -eq "t" -or $installPython -eq "Y" -or $installPython -eq "y") {
+        
+        if ($AutoInstallPython) {
+            Write-Host "Próbuję zainstalować Pythona automatycznie..." -ForegroundColor Yellow
             if (-not (Install-PythonWinget)) {
+                Write-Host ""
+                Write-Host "Automatyczna instalacja nie powiodła się." -ForegroundColor Red
+                Write-Host "Przechodzę do instrukcji ręcznej instalacji..." -ForegroundColor Yellow
                 Install-PythonManual
-            }
-            # Sprawdź ponownie po instalacji
-            Start-Sleep -Seconds 2
-            if (-not (Test-PythonInstalled)) {
-                Write-Host "Proszę zrestartować terminal i uruchomić skrypt ponownie" -ForegroundColor Yellow
-                exit 1
+            } else {
+                # Sprawdź ponownie po instalacji
+                Write-Host "Oczekiwanie na zakończenie instalacji Pythona..." -ForegroundColor Yellow
+                Start-Sleep -Seconds 3
+                # Odświeżenie PATH
+                $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+                
+                if (-not (Test-PythonInstalled)) {
+                    Write-Host ""
+                    Write-Host "Python został zainstalowany, ale nie jest jeszcze dostępny w terminalu." -ForegroundColor Yellow
+                    Write-Host "Proszę:" -ForegroundColor Yellow
+                    Write-Host "  1. Zamknąć to okno" -ForegroundColor Cyan
+                    Write-Host "  2. Otworzyć nowe okno PowerShell lub wiersz poleceń" -ForegroundColor Cyan
+                    Write-Host "  3. Uruchomić instalator ponownie" -ForegroundColor Cyan
+                    Write-Host ""
+                    Write-Host "Naciśnij Enter, aby zakończyć..." -ForegroundColor Yellow
+                    Read-Host
+                    exit 1
+                }
             }
         } else {
-            Write-Host "Instalacja przerwana. Python jest wymagany do dalszej pracy." -ForegroundColor Red
-            exit 1
+            $installPython = Read-Host "Czy chcesz zainstalować Pythona automatycznie? (T/N)"
+            if ($installPython -eq "T" -or $installPython -eq "t" -or $installPython -eq "Y" -or $installPython -eq "y") {
+                if (-not (Install-PythonWinget)) {
+                    Install-PythonManual
+                }
+                # Sprawdź ponownie po instalacji
+                Start-Sleep -Seconds 3
+                $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+                if (-not (Test-PythonInstalled)) {
+                    Write-Host "Proszę zrestartować terminal i uruchomić skrypt ponownie" -ForegroundColor Yellow
+                    exit 1
+                }
+            } else {
+                Write-Host "Instalacja przerwana. Python jest wymagany do dalszej pracy." -ForegroundColor Red
+                exit 1
+            }
         }
     }
 } else {
@@ -141,14 +183,17 @@ Write-Host "✓ Wszystkie zależności zainstalowane" -ForegroundColor Green
 # Podsumowanie
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Green
-Write-Host "  Instalacja zakończona pomyślnie!" -ForegroundColor Green
+Write-Host "  ✓ Instalacja zakończona pomyślnie!" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Aby uruchomić aplikację, użyj:" -ForegroundColor Cyan
-Write-Host "  .\run.ps1" -ForegroundColor Yellow
+Write-Host "Aplikacja jest gotowa do uruchomienia!" -ForegroundColor White
 Write-Host ""
-Write-Host "lub ręcznie:" -ForegroundColor Cyan
-Write-Host "  .\.venv\Scripts\Activate.ps1" -ForegroundColor Yellow
-Write-Host "  streamlit run src/soke/app.py" -ForegroundColor Yellow
+Write-Host "Aby uruchomić aplikację:" -ForegroundColor Cyan
+Write-Host "  • Kliknij dwukrotnie plik: run.bat" -ForegroundColor Yellow
+Write-Host "  • Lub uruchom: .\run.ps1" -ForegroundColor Yellow
 Write-Host ""
+Write-Host "Aplikacja otworzy się automatycznie w przeglądarce." -ForegroundColor Gray
+Write-Host ""
+Write-Host "Naciśnij Enter, aby zakończyć..." -ForegroundColor Gray
+Read-Host
 

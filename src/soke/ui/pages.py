@@ -8,6 +8,7 @@ from soke.engine.module_a import calc_module_a
 from soke.engine.module_b import calc_module_b
 from soke.engine.module_c import calc_module_c
 from soke.engine.module_d import calc_module_d
+from soke.engine.module_pv import calc_module_pv
 from soke.engine.summary import calc_summary, store_results
 from soke.ui.components import kpi_card, section_title
 
@@ -16,8 +17,8 @@ def render_header() -> None:
     st.caption("Czerwone = straty / ryzyko. Zielone = oszczędności. Niebieskie = dane techniczne.")
 
 def render_tabs(client: ClientInput, tariffs: OperatorTariffs) -> None:
-    tab_a, tab_b, tab_c, tab_d = st.tabs(
-        ["Moduł A – Energia czynna", "Moduł B – Taryfy", "Moduł C – Moc", "Moduł D – Moc bierna"]
+    tab_a, tab_b, tab_c, tab_d, tab_pv = st.tabs(
+        ["Moduł A – Energia czynna", "Moduł B – Taryfy", "Moduł C – Moc", "Moduł D – Moc bierna", "Moduł PV – Fotowoltaika"]
     )
 
     with tab_a:
@@ -36,7 +37,7 @@ def render_tabs(client: ClientInput, tariffs: OperatorTariffs) -> None:
                     {"Parametr": "Roczne zużycie (kWh)", "Wartość": client.annual_kwh},
                 ]
             )
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width='stretch')
 
     with tab_b:
         section_title("Bitwa taryf – C11 vs C12a")
@@ -56,7 +57,7 @@ def render_tabs(client: ClientInput, tariffs: OperatorTariffs) -> None:
 
         chart_df = pd.DataFrame([{"Taryfa": "C11", "Koszt": res.cost_c11_pln}, {"Taryfa": "C12a", "Koszt": res.cost_c12a_pln}])
         fig = px.bar(chart_df, x="Taryfa", y="Koszt", title="Porównanie kosztu rocznego")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         st.info("Stawki pobieramy z YAML dla wybranego operatora (rok 2026). Pipeline z PDF jest w `scripts/`.")
 
@@ -87,7 +88,7 @@ def render_tabs(client: ClientInput, tariffs: OperatorTariffs) -> None:
             ]
         )
         fig = px.bar(chart_df, x="Wartość", y="kW", title="Moc: zamówiona vs realna")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     with tab_d:
         section_title("Moc bierna – ciche złodzieje")
@@ -122,7 +123,41 @@ def render_tabs(client: ClientInput, tariffs: OperatorTariffs) -> None:
             ]
         )
         fig = px.pie(pie_df, names="Składnik", values="PLN", title="Udział kar w rachunku (szacunek)")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
+
+    with tab_pv:
+        section_title("Fotowoltaika – autokonsumpcja i udział produkcji własnej")
+        res = calc_module_pv(client)
+        store_results(module="PV", payload=res.__dict__)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            kpi_card("Autokonsumpcja", f"{res.autoconsumption_kwh:,.0f} kWh/rok", "Produkcja - energia oddana do sieci", "tech")
+        with c2:
+            kpi_card("Udział produkcji własnej", f"{res.self_consumption_percent:.1f}%", "Autokonsumpcja / całkowite zużycie", "tech")
+
+        # Tabela z danymi wejściowymi i wynikami
+        df = pd.DataFrame(
+            [
+                {"Parametr": "Roczna produkcja PV (kWh)", "Wartość": client.pv_annual_production_kwh},
+                {"Parametr": "Energia oddana do sieci (kWh)", "Wartość": client.pv_energy_sold_to_grid_kwh},
+                {"Parametr": "Autokonsumpcja (kWh)", "Wartość": res.autoconsumption_kwh},
+                {"Parametr": "Całkowite zużycie (kWh)", "Wartość": client.annual_kwh},
+                {"Parametr": "Udział produkcji własnej (%)", "Wartość": res.self_consumption_percent},
+            ]
+        )
+        st.dataframe(df, width='stretch', column_config={"Wartość": st.column_config.NumberColumn(format="%.1f")})
+
+        # Wykres kołowy pokazujący podział produkcji
+        if client.pv_annual_production_kwh > 0:
+            production_df = pd.DataFrame(
+                [
+                    {"Składnik": "Autokonsumpcja", "kWh": res.autoconsumption_kwh},
+                    {"Składnik": "Oddana do sieci", "kWh": client.pv_energy_sold_to_grid_kwh},
+                ]
+            )
+            fig = px.pie(production_df, names="Składnik", values="kWh", title="Podział produkcji z fotowoltaiki")
+            st.plotly_chart(fig, width='stretch')
 
 def render_footer(client: ClientInput, tariffs: OperatorTariffs) -> None:
     st.divider()

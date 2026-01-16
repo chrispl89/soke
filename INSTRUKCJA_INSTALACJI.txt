@@ -1,0 +1,58 @@
+================================================================================
+  SOKE - INSTRUKCJA INSTALACJI
+  System Optymalizacji Kosztów Energii
+================================================================================
+
+INSTALACJA (wykonaj tylko raz)
+--------------------------------------------------------------------------------
+
+1. Uruchom plik: install.bat (kliknij dwukrotnie)
+
+2. Instalator automatycznie:
+   - Sprawdzi czy Python jest zainstalowany
+   - Zainstaluje Pythona (jeśli potrzeba) - potwierdź instalację
+   - Zainstaluje wszystkie zależności projektu
+
+3. Poczekaj na zakończenie instalacji (5-15 minut)
+
+URUCHOMIENIE
+--------------------------------------------------------------------------------
+
+1. Uruchom plik: run.bat (kliknij dwukrotnie)
+
+2. Aplikacja otworzy się automatycznie w przeglądarce
+
+3. Aby zatrzymać aplikację: zamknij okno terminala
+
+ROZWIĄZYWANIE PROBLEMÓW
+--------------------------------------------------------------------------------
+
+Problem: "Aplikacja nie jest zainstalowana"
+→ Uruchom ponownie: install.bat
+
+Problem: PowerShell blokuje skrypty
+→ Kliknij prawym przyciskiem na install.bat → "Uruchom jako administrator"
+
+Problem: Aplikacja nie otwiera się w przeglądarce
+→ Otwórz ręcznie: http://localhost:8501
+
+Problem: Instalacja się nie powiodła
+→ Sprawdź połączenie z internetem i uruchom install.bat ponownie
+
+Problem: Python nie jest rozpoznawany
+→ Zrestartuj komputer i uruchom install.bat ponownie
+
+WYMAGANIA
+--------------------------------------------------------------------------------
+
+- Windows 10/11
+- Połączenie z internetem (do pobrania zależności)
+- ~500 MB miejsca na dysku
+
+ZAawansowani użytkownicy
+--------------------------------------------------------------------------------
+
+Instalacja:  .\install.ps1
+Uruchomienie: .\run.ps1
+
+Więcej informacji: INSTALL.md
