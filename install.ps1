@@ -1,4 +1,4 @@
-# Instalator SOKE dla Windows
+﻿﻿# Instalator SOKE dla Windows
 # Instaluje Pythona (jeśli potrzebny) i wszystkie zależności projektu
 # Przyjazny dla osób niekomputerowych - automatyczna instalacja
 
@@ -18,10 +18,10 @@ Write-Host "  System Optymalizacji Kosztów Energii" -ForegroundColor Cyan
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Ten instalator automatycznie:" -ForegroundColor White
-Write-Host "  • Sprawdzi czy Python jest zainstalowany" -ForegroundColor Gray
-Write-Host "  • Zainstaluje Pythona (jeśli potrzeba)" -ForegroundColor Gray
-Write-Host "  • Zainstaluje wszystkie potrzebne programy" -ForegroundColor Gray
-Write-Host "  • Przygotuje aplikację do uruchomienia" -ForegroundColor Gray
+Write-Host "  - Sprawdzi czy Python jest zainstalowany" -ForegroundColor Gray
+Write-Host "  - Zainstaluje Pythona (jesli potrzeba)" -ForegroundColor Gray
+Write-Host "  - Zainstaluje wszystkie potrzebne programy" -ForegroundColor Gray
+Write-Host "  - Przygotuje aplikacje do uruchomienia" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Proszę czekać, instalacja może potrwać kilka minut..." -ForegroundColor Yellow
 Write-Host ""
@@ -36,10 +36,10 @@ function Test-PythonInstalled {
                 $major = [int]$matches[1]
                 $minor = [int]$matches[2]
                 if ($major -ge 3 -and $minor -ge 11) {
-                    Write-Host "✓ Python $($matches[0]) jest zainstalowany" -ForegroundColor Green
+                    Write-Host "OK: Python $($matches[0]) jest zainstalowany" -ForegroundColor Green
                     return $true
                 } else {
-                    Write-Host "✗ Python jest za stary (wymagany 3.11+, znaleziono $($matches[0]))" -ForegroundColor Red
+                    Write-Host "BLAD: Python jest za stary (wymagany 3.11+, znaleziono $($matches[0]))" -ForegroundColor Red
                     return $false
                 }
             }
@@ -60,7 +60,7 @@ function Install-PythonWinget {
             Write-Host "Instalowanie Pythona 3.11+ przez winget..." -ForegroundColor Yellow
             winget install Python.Python.3.11 --silent --accept-package-agreements --accept-source-agreements
             if ($LASTEXITCODE -eq 0) {
-                Write-Host "✓ Python zainstalowany przez winget" -ForegroundColor Green
+                Write-Host "OK: Python zainstalowany przez winget" -ForegroundColor Green
                 # Odświeżenie PATH
                 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
                 return $true
@@ -155,45 +155,44 @@ if (Test-Path ".venv") {
 
 python -m venv .venv
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "✗ Błąd podczas tworzenia środowiska wirtualnego" -ForegroundColor Red
+    Write-Host "BLAD: Blad podczas tworzenia srodowiska wirtualnego" -ForegroundColor Red
     exit 1
 }
-Write-Host "✓ Środowisko wirtualne utworzone" -ForegroundColor Green
+Write-Host "OK: Srodowisko wirtualne utworzone" -ForegroundColor Green
 
 # KROK 3: Aktualizacja pip
 Write-Host ""
 Write-Host "[3/4] Aktualizacja pip..." -ForegroundColor Cyan
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "✗ Błąd podczas aktualizacji pip" -ForegroundColor Red
+    Write-Host "BLAD: Blad podczas aktualizacji pip" -ForegroundColor Red
     exit 1
 }
-Write-Host "✓ pip zaktualizowany" -ForegroundColor Green
+Write-Host "OK: pip zaktualizowany" -ForegroundColor Green
 
 # KROK 4: Instalacja zależności projektu
 Write-Host ""
 Write-Host "[4/4] Instalacja zależności projektu..." -ForegroundColor Cyan
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "✗ Błąd podczas instalacji zależności" -ForegroundColor Red
+    Write-Host "BLAD: Blad podczas instalacji zaleznosci" -ForegroundColor Red
     exit 1
 }
-Write-Host "✓ Wszystkie zależności zainstalowane" -ForegroundColor Green
+Write-Host "OK: Wszystkie zaleznosci zainstalowane" -ForegroundColor Green
 
 # Podsumowanie
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Green
-Write-Host "  ✓ Instalacja zakończona pomyślnie!" -ForegroundColor Green
+Write-Host "  OK: Instalacja zakonczona pomyslnie!" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Aplikacja jest gotowa do uruchomienia!" -ForegroundColor White
 Write-Host ""
 Write-Host "Aby uruchomić aplikację:" -ForegroundColor Cyan
-Write-Host "  • Kliknij dwukrotnie plik: run.bat" -ForegroundColor Yellow
-Write-Host "  • Lub uruchom: .\run.ps1" -ForegroundColor Yellow
+Write-Host "  - Kliknij dwukrotnie plik: run.bat" -ForegroundColor Yellow
+Write-Host "  - Lub uruchom: .\run.ps1" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Aplikacja otworzy się automatycznie w przeglądarce." -ForegroundColor Gray
 Write-Host ""
 Write-Host "Naciśnij Enter, aby zakończyć..." -ForegroundColor Gray
 Read-Host
-

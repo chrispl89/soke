@@ -1,4 +1,4 @@
-# Skrypt uruchomieniowy dla SOKE
+﻿# Skrypt uruchomieniowy dla SOKE
 # Przyjazny dla osób niekomputerowych
 
 $ErrorActionPreference = "Stop"
